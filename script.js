@@ -19,12 +19,20 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const messaging = getMessaging(app);
 
+// Service Worker Registration for FCM
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/firebase-messaging-sw.js')
+        .then(function(registration) {
+            console.log('Service Worker registered with scope:', registration.scope);
+        })
+        .catch(function(error) {
+            console.error('Service Worker registration failed:', error);
+        });
+}
+
 // Handle login form submission
 document.getElementById("loginForm").addEventListener("submit", function (e) {
     e.preventDefault();  // Prevent form from refreshing the page
-
-    // Log to verify the form submission
-    console.log("Form submitted");
 
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value.trim();
@@ -33,10 +41,6 @@ document.getElementById("loginForm").addEventListener("submit", function (e) {
         alert("Please enter both username and password.");
         return;
     }
-
-    // Log the username and password to verify the inputs
-    console.log("Username:", username);
-    console.log("Password:", password);
 
     // Reference to the 'users' node in Firebase
     const dbRef = ref(db, 'users/' + username);
